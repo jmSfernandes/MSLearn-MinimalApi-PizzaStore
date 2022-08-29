@@ -5,29 +5,36 @@ namespace MSLearn_MinimalApi_PizzaStore.Services;
 
 public class PizzaService : IPizzaService
 {
-    public Pizza? GetPizza(int id)
+    private PizzaDb _db;
+
+    public PizzaService(PizzaDb pizzaDb)
     {
-        return PizzaDb.GetPizza(id);
+        _db = pizzaDb;
+        
     }
 
-    public List<Pizza> GetPizzas()
+    public async Task<IResult> GetPizza(int id)
     {
-        return PizzaDb.GetPizzas();
+        return await _db.GetPizza(id);
     }
 
-    public IResult AddPizza(Pizza pizza)
+    public async Task<List<Pizza>> GetPizzas()
     {
-        return PizzaDb.CreatePizza(pizza);
-    }
-    
-    public IResult UpdatePizza(Pizza pizza)
-    {
-        return PizzaDb.UpdatePizza(pizza);
+        return await _db.GetPizzas();
     }
 
-    public IResult DeletePizza(int id)
+    public async Task<IResult> AddPizza(Pizza pizza)
     {
-        PizzaDb.RemovePizza(id);
-        return Results.Ok($"Pizza {id} deleted with success");
+        return await _db.CreatePizza(pizza);
+    }
+
+    public async Task<IResult> UpdatePizza(Pizza pizza, int id)
+    {
+        return await _db.UpdatePizza(pizza, id);
+    }
+
+    public async Task<IResult> DeletePizza(int id)
+    {
+        return await _db.RemovePizza(id);
     }
 }

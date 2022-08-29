@@ -1,5 +1,4 @@
 ﻿using EndpointDefinitions;
-using MSLearn_MinimalApi_PizzaStore.Data;
 using MSLearn_MinimalApi_PizzaStore.Models;
 using MSLearn_MinimalApi_PizzaStore.Services;
 
@@ -7,18 +6,15 @@ namespace MSLearn_MinimalApi_PizzaStore.EndpointDefinitions;
 
 public class PizzaEndpointDefinition : IEndpointDefinition
 {
-    
-    
     public void DefineEndpoints(WebApplication app)
     {
-      
-        app.MapGet("/", ()=>"Hello World!")
+        app.MapGet("/", () => "Hello World!")
             .WithName("Hello World").WithTags("Data");
-        app.MapGet("/pizzas/{id}", GetPizza);
-        app.MapGet("/pizzas", GetPizzas);
-        app.MapPost("/pizzas", AddPizza);
-        app.MapPut("/pizzas", UpdatePizza);
-        app.MapDelete("/pizzas/{id}", DeletePizza);
+        app.MapGet("/pizzas/{id}", GetPizza).WithTags("Pizza");
+        app.MapGet("/pizzas", GetPizzas).WithTags("Pizza");
+        app.MapPost("/pizzas", AddPizza).WithTags("Pizza");
+        app.MapPut("/pizzas/{id}", UpdatePizza).WithTags("Pizza");
+        app.MapDelete("/pizzas/{id}", DeletePizza).WithTags("Pizza");
     }
 
     public void DefineServices(IServiceCollection services)
@@ -27,26 +23,28 @@ public class PizzaEndpointDefinition : IEndpointDefinition
         services.AddScoped<IPizzaService, PizzaService>();
     }
 
-    private List<Pizza> GetPizzas(IPizzaService service)
+    private async Task<List<Pizza>> GetPizzas(IPizzaService service)
     {
-        return service.GetPizzas();
+        return await service.GetPizzas();
     }
-    private Pizza? GetPizza(IPizzaService service, int id)
+
+    private async Task<IResult> GetPizza(IPizzaService service, int id)
     {
-        return service.GetPizza(id);
+        return await service.GetPizza(id);
     }
-    
-    private IResult AddPizza(IPizzaService service, Pizza pizza)
+
+    private async Task<IResult> AddPizza(IPizzaService service, Pizza pizza)
     {
-        return service.AddPizza(pizza);
+        return await service.AddPizza(pizza);
     }
-    private IResult UpdatePizza(IPizzaService service, Pizza pizza)
+
+    private async Task<IResult> UpdatePizza(IPizzaService service, Pizza pizza, int id)
     {
-        return service.UpdatePizza(pizza);
+        return await service.UpdatePizza(pizza, id);
     }
-    private IResult DeletePizza(IPizzaService service, int id)
+
+    private async Task<IResult> DeletePizza(IPizzaService service, int id)
     {
-        return service.DeletePizza(id);
+        return await service.DeletePizza(id);
     }
-    
 }

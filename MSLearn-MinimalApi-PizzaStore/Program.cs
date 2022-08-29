@@ -1,5 +1,7 @@
 using EndpointDefinitions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MSLearn_MinimalApi_PizzaStore.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +13,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo{Title = "Pizza Store", Description = "Making the Pizzas you love",Version = "V1"});
+    c.SwaggerDoc("v1",
+        new OpenApiInfo {Title = "Pizza Store", Description = "Making the Pizzas you love", Version = "V1"});
 });
 builder.Services.AddAllEndpointDefinitions();
+//Add InMemoryDb
+//builder.Services.AddDbContext<PizzaDb>(options => options.UseInMemoryDatabase("pizzas"));
+
+//with Sqlite
+var connectionString = builder.Configuration.GetConnectionString("Pizzas") ?? "Data Source=Pizzas.db";
+builder.Services.AddSqlite<PizzaDb>(connectionString);
+
 
 /* // if you want to filter the endpoints that are enabled;
  builder.Services.AddEndpointDefinitions(new Type[]

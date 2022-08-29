@@ -1,57 +1,59 @@
-﻿using MSLearn_MinimalApi_PizzaStore.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using MSLearn_MinimalApi_PizzaStore.Models;
 
 namespace MSLearn_MinimalApi_PizzaStore.Data;
 
-public class PizzaDb
+public class PizzaDb : DbContext
 {
-    private static List<Pizza> _pizzas = new List<Pizza>()
+    public PizzaDb(DbContextOptions options) : base(options)
     {
-        new Pizza {Id = 1, Name = "Montemagno, Pizza shaped like a great mountain"},
-        new Pizza {Id = 2, Name = "The Galloway, Pizza shaped like a submarine, silent but deadly"},
-        new Pizza {Id = 3, Name = "The Noring, Pizza shaped like a Viking helmet, where's the mead"}
-    };
-
-    public static List<Pizza> GetPizzas()
-    {
-        return _pizzas;
+        
     }
 
-    public static Pizza? GetPizza(int id)
+    public DbSet<Pizza> Pizzas { get; set; } = null!;
+
+
+    public async Task<List<Pizza>> GetPizzas()
     {
-        return _pizzas.SingleOrDefault(pizza => pizza.Id == id);
+        return await Pizzas.ToListAsync();
     }
 
-    public static IResult CreatePizza(Pizza pizza)
+    public async Task<IResult> GetPizza(int id)
     {
-        var verification = _pizzas.SingleOrDefault(x => x.Id == pizza.Id);
-        if (verification != null)
-            return Results.UnprocessableEntity("This pizza is already in the database!");
-        _pizzas.Add(pizza);
+        var pizza = await Pizzas.FindAsync(id);
+        if (pizza == null)
+            return Results.NotFound($"Entity with Id: {id} not found");
+        return Results.Ok(pizza);
+    }
 
+    public async Task<IResult> CreatePizza(Pizza pizza)
+    {
+        await Pizzas.AddAsync(pizza);
+        await this.SaveChangesAsync();
         return Results.Created($"/pizzas/{pizza.Id}", pizza);
     }
 
-    public static IResult UpdatePizza(Pizza update)
+    public async Task<IResult> UpdatePizza(Pizza update, int id)
     {
-        var found = false;
-        _pizzas = _pizzas.Select(pizza =>
-        {
-            if (pizza.Id == update.Id)
-            {
-                pizza.Name = update.Name;
-                found = true;
-            }
+        var verification = await Pizzas.FindAsync(id);
+        if (verification == null)
+            return Results.NotFound($"Entity with Id: {id} not found");
+        verification.Name = update.Name;
+        verification.Description = update.Description;
+        var set = Pizzas.Update(verification);
+        await this.SaveChangesAsync();
 
-            return pizza;
-        }).ToList();
-        if (!found)
-            return Results.NotFound($"Entity with Id: {update.Id} not found");
-        
-        return Results.Ok(update);
+        return Results.Ok(verification);
     }
 
-    public static void RemovePizza(int id)
+    public async Task<IResult> RemovePizza(int id)
     {
-        _pizzas = _pizzas.FindAll(pizza => pizza.Id != id).ToList();
+        var verification = await Pizzas.FindAsync(id);
+        if (verification == null)
+            return Results.NotFound($"Entity with Id: {id} not found");
+
+        Pizzas.Remove(verification);
+        await this.SaveChangesAsync();
+        return Results.Ok();
     }
 }

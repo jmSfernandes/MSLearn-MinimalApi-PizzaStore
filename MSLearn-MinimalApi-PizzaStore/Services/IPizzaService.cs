@@ -4,10 +4,10 @@ namespace MSLearn_MinimalApi_PizzaStore.Services;
 
 public interface IPizzaService
 {
-    Pizza? GetPizza(int id);
-    List<Pizza> GetPizzas();
-    IResult AddPizza(Pizza pizza);
-    IResult UpdatePizza(Pizza pizza);
-    IResult DeletePizza(int id);
+    Task<IResult> GetPizza(int id);
+    Task<List<Pizza>> GetPizzas();
+    Task<IResult> AddPizza(Pizza pizza);
+    Task<IResult> UpdatePizza(Pizza pizza, int id);
+    Task<IResult> DeletePizza(int id);
     
 }
