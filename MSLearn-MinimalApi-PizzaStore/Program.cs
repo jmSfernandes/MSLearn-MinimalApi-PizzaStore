@@ -23,7 +23,18 @@ builder.Services.AddAllEndpointDefinitions();
 //with Sqlite
 var connectionString = builder.Configuration.GetConnectionString("Pizzas") ?? "Data Source=Pizzas.db";
 builder.Services.AddSqlite<PizzaDb>(connectionString);
+//allow cors
+const string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+builder.Services.AddCors(options =>
+{
+    
+    options.AddPolicy(name: myAllowSpecificOrigins,
+        builder =>
+        {
+            builder.AllowAnyOrigin();
+        });
+});
 
 /* // if you want to filter the endpoints that are enabled;
  builder.Services.AddEndpointDefinitions(new Type[]
@@ -44,5 +55,8 @@ if (app.Environment.IsDevelopment())
 //redirection from http to https
 //app.UseHttpsRedirection();
 app.UseEndpointDefinitions();
+
+app.UseCors();
+
 
 app.Run();
