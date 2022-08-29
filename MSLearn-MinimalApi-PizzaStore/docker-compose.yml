@@ -1,0 +1,26 @@
+version: "2.0"
+services:
+
+  customTemplate:
+    image: marcelo/mslearn_minimalapi_pizzastore
+    hostname: mslearn_minimalapi_pizzastore
+    container_name: mslearn_minimalapi_pizzastore
+    restart: always
+    expose:
+    - '80'
+    - '443'
+    environment:
+    #- ASPNETCORE_URLS=https://+;http://+ # if we want https support
+    - Kestrel__Certificates__Default__Path=/app/Certs/cert.pem
+    - Kestrel__Certificates__Default__KeyPath=/app/Certs/key.pem
+    ports:
+    - "80:80"
+    - "9008:443"
+    volumes:
+    - ./MSLearn_MinimalApi_PizzaStore/appsettings-w-https.json:/app/appsettings.json
+    - ./MSLearn_MinimalApi_PizzaStore/Certs/cert.pem:/app/Certs/cert.pem
+    - ./MSLearn_MinimalApi_PizzaStore/Certs/key.pem:/app/Certs/key.pem
+    logging:
+       options:
+         max-size: 50m
+
